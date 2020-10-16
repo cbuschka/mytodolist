@@ -1,15 +1,18 @@
 TOPDIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+SCOPE := ${USERNAME}-
 
+build:
+	mvn install
 
-install:	init
-	@if [ ! -d "${TOPDIR}/venv/" ]; then \
-		echo "Installing packages..."; \
-		pipenv install; \
-	fi
+deploy_service:	build
+	cd ${TOPDIR}/infrastructure && \
+	terraform init && \
+	terraform apply -auto-approve -var="scope=${SCOPE}"
 
-init:
-	@if [ "x$(shell pipenv --version 2>/dev/null)" == "x" ]; then \
-		echo "Installing pipenv..."; \
-		sudo dnf -y install pipenv; \
-	fi
+destroy_service:
+	cd ${TOPDIR}/infrastructure && \
+	terraform init && \
+	terraform destroy -auto-approve -var="scope=${SCOPE}"
 
+clean:
+	mvn clean
