@@ -6,7 +6,6 @@ resource "aws_api_gateway_method" "request_method" {
   authorization = "NONE"
 }
 
-# Example: GET /hello => POST lambda
 resource "aws_api_gateway_integration" "request_method_integration" {
   rest_api_id = var.rest_api_id
   resource_id = var.resource_id
@@ -16,9 +15,28 @@ resource "aws_api_gateway_integration" "request_method_integration" {
 
   # AWS lambdas can only be invoked with the POST method
   integration_http_method = "POST"
+
+  request_templates = {
+    "application/json" = <<EOF
+#set($allParams = $input.params())
+{
+  "params" : {
+    #foreach($type in $allParams.keySet())
+    #set($params = $allParams.get($type))
+    "$type" : {
+      #foreach($paramName in $params.keySet())
+      "$paramName" : "$util.escapeJavaScript($params.get($paramName))"
+      #if($foreach.hasNext),#end
+      #end
+    }
+    #if($foreach.hasNext),#end
+    #end
+  }
+}
+EOF
+  }
 }
 
-# lambda => GET response
 resource "aws_api_gateway_method_response" "response_method" {
   rest_api_id = var.rest_api_id
   resource_id = var.resource_id
@@ -30,7 +48,6 @@ resource "aws_api_gateway_method_response" "response_method" {
   }
 }
 
-# Response for: GET /hello
 resource "aws_api_gateway_integration_response" "response_method_integration" {
   rest_api_id = var.rest_api_id
   resource_id = var.resource_id

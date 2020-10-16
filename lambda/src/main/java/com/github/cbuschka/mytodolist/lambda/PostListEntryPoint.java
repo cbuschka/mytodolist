@@ -24,6 +24,7 @@ public class PostListEntryPoint implements RequestHandler<Map<String, Object>, M
 		log.info("Got: {}", request);
 
 		HashMap<String, Object> response = new HashMap<>();
+		response.put("request", request);
 
 		log.info("Answering: {}", response);
 
