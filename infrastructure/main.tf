@@ -31,10 +31,20 @@ resource "aws_iam_role_policy_attachment" "lambda_policy_attachment" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-module "lambda" {
+module "mytodolist_lambda_getlist" {
   source = "./modules/lambda"
-  name = "mytodolist_lambda"
+  name = "mytodolist_lambda_getlist"
   handler = "com.github.cbuschka.mytodolist.lambda.GetListEntryPoint"
+  runtime = "java11"
+  archive = "../lambda/target/lambda.jar"
+  role = aws_iam_role.iam_role_for_lambda.arn
+  scope = var.scope
+}
+
+module "mytodolist_lambda_postlist" {
+  source = "./modules/lambda"
+  name = "mytodolist_lambda_postlist"
+  handler = "com.github.cbuschka.mytodolist.lambda.PostListEntryPoint"
   runtime = "java11"
   archive = "../lambda/target/lambda.jar"
   role = aws_iam_role.iam_role_for_lambda.arn
@@ -57,15 +67,27 @@ module "mytodolist_list_get" {
   resource_id = aws_api_gateway_resource.mytodolist_api_res_list.id
   method = "GET"
   path = aws_api_gateway_resource.mytodolist_api_res_list.path
-  lambda = module.lambda.name
+  lambda = module.mytodolist_lambda_postlist.name
+  region = var.aws_region
+  account_id = data.aws_caller_identity.current.account_id
+  scope = var.scope
+}
+
+module "mytodolist_list_post" {
+  source = "./modules/api_binding"
+  rest_api_id = aws_api_gateway_rest_api.mytodolist_api.id
+  resource_id = aws_api_gateway_resource.mytodolist_api_res_list.id
+  method = "POST"
+  path = aws_api_gateway_resource.mytodolist_api_res_list.path
+  lambda = module.mytodolist_lambda_postlist.name
   region = var.aws_region
   account_id = data.aws_caller_identity.current.account_id
   scope = var.scope
 }
 
 # We can deploy the API now! (i.e. make it publicly available)
-resource "aws_api_gateway_deployment" "hello_api_deployment" {
+resource "aws_api_gateway_deployment" "mytodolist_api_deployment" {
   rest_api_id = aws_api_gateway_rest_api.mytodolist_api.id
   stage_name = "${var.scope}api"
-  description = "Deploy methods: ${module.mytodolist_list_get.http_method}"
+  description = "Deploy methods: ${module.mytodolist_list_get.http_method}  ${module.mytodolist_list_post.http_method}"
 }

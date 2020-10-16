@@ -44,7 +44,7 @@ resource "aws_api_gateway_integration_response" "response_method_integration" {
 
 resource "aws_lambda_permission" "allow_api_gateway" {
   function_name = var.lambda
-  statement_id = "AllowExecutionFromApiGateway"
+  statement_id = "AllowExecutionFromApiGateway_${var.method}"
   action = "lambda:InvokeFunction"
   principal = "apigateway.amazonaws.com"
   source_arn = "arn:aws:execute-api:${var.region}:${var.account_id}:${var.rest_api_id}/*/${var.method}${var.path}"
