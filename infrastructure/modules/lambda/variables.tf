@@ -22,3 +22,8 @@ variable "archive" {
 
 variable "scope" {
 }
+
+variable "environment" {
+  type = "map"
+  default = {}
+}

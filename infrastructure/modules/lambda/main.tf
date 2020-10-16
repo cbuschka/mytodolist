@@ -4,4 +4,7 @@ resource "aws_lambda_function" "lambda" {
   role = var.role
   handler = var.handler
   runtime = var.runtime
+  environment = merge(var.environment, {
+    "SCOPE": var.scope
+  })
 }

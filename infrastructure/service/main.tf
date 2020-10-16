@@ -32,7 +32,7 @@ resource "aws_iam_role_policy_attachment" "lambda_policy_attachment" {
 }
 
 module "mytodolist_lambda_getlist" {
-  source = "./modules/lambda"
+  source = "../modules/lambda"
   name = "mytodolist_lambda_getlist"
   handler = "com.github.cbuschka.mytodolist.lambda.GetListEntryPoint"
   runtime = "java11"
@@ -42,7 +42,7 @@ module "mytodolist_lambda_getlist" {
 }
 
 module "mytodolist_lambda_postlist" {
-  source = "./modules/lambda"
+  source = "../modules/lambda"
   name = "mytodolist_lambda_postlist"
   handler = "com.github.cbuschka.mytodolist.lambda.PostListEntryPoint"
   runtime = "java11"
@@ -62,7 +62,7 @@ resource "aws_api_gateway_resource" "mytodolist_api_res_list" {
 }
 
 module "mytodolist_list_get" {
-  source = "./modules/api_binding"
+  source = "../modules/api_binding"
   rest_api_id = aws_api_gateway_rest_api.mytodolist_api.id
   resource_id = aws_api_gateway_resource.mytodolist_api_res_list.id
   method = "GET"
@@ -74,7 +74,7 @@ module "mytodolist_list_get" {
 }
 
 module "mytodolist_list_post" {
-  source = "./modules/api_binding"
+  source = "../modules/api_binding"
   rest_api_id = aws_api_gateway_rest_api.mytodolist_api.id
   resource_id = aws_api_gateway_resource.mytodolist_api_res_list.id
   method = "POST"
