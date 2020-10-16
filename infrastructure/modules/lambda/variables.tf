@@ -23,7 +23,5 @@ variable "archive" {
 variable "scope" {
 }
 
-variable "environment" {
-  type = "map"
-  default = {}
+variable "build_version" {
 }

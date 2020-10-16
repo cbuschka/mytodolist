@@ -6,3 +6,7 @@ variable "aws_region" {
 variable "scope" {
   default = ""
 }
+
+variable "build_version" {
+  default = "unknown"
+}

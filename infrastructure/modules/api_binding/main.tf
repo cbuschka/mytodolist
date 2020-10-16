@@ -12,27 +12,7 @@ resource "aws_api_gateway_integration" "request_method_integration" {
   http_method = aws_api_gateway_method.request_method.http_method
   type = "AWS"
   uri = "arn:aws:apigateway:${var.region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${var.region}:${var.account_id}:function:${var.lambda}/invocations"
-
-  # AWS lambdas can only be invoked with the POST method
   integration_http_method = "POST"
-
-  request_templates = {
-    "application/json" = <<EOF
-#set($allParams = $input.params())
-{
-  #foreach($type in $allParams.keySet())
-  #set($params = $allParams.get($type))
-  "$type" : {
-    #foreach($paramName in $params.keySet())
-    "$paramName" : "$util.escapeJavaScript($params.get($paramName))"
-    #if($foreach.hasNext),#end
-    #end
-  }
-  #if($foreach.hasNext),#end
-  #end
-}
-EOF
-  }
 }
 
 resource "aws_api_gateway_method_response" "response_method" {

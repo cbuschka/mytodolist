@@ -1,7 +1,8 @@
-package com.github.cbuschka.mytodolist.lambda;
+package com.github.cbuschka.mytodolist.lambda.get_list;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.github.cbuschka.mytodolist.lambda.AppContext;
 import com.github.codestickers.Used;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,8 @@ public class GetListEntryPoint implements RequestHandler<Map<String, Object>, Ma
 {
 	private static final Logger log = LoggerFactory.getLogger(GetListEntryPoint.class);
 
+	private AppContext appContext = new AppContext();
+
 	@Used("Required by AWS lambda runtime.")
 	public GetListEntryPoint()
 	{
@@ -21,13 +24,24 @@ public class GetListEntryPoint implements RequestHandler<Map<String, Object>, Ma
 	@Override
 	public Map<String, Object> handleRequest(Map<String, Object> request, Context lambdaContext)
 	{
-		log.info("Got: {}", request);
+		log.info("Built at {}.", this.appContext.getVersion());
 
-		HashMap<String, Object> response = new HashMap<>();
-		response.put("request", request);
+		try
+		{
+			log.info("Got: {}", request);
 
-		log.info("Answering: {}", response);
+			HashMap<String, Object> response = new HashMap<>();
+			response.put("request", request);
 
-		return response;
+			log.info("Answering: {}", response);
+
+			return response;
+		}
+		catch (Exception ex)
+		{
+			log.error("Processing failed.", ex);
+
+			throw new RuntimeException(ex);
+		}
 	}
 }
